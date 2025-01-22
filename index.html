@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PopG2P</title>
+    <style>
+        body {
+            background-color: #f2e8cf;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        input[type="text"] {
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 200px;
+        }
+        button {
+            padding: 8px 16px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form action="/process" method="POST" id="inputForm">
+            <div class="input-group">
+                <input type="text" id="userInput" name="userInput" placeholder="Enter your input">
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+
+        <select id="imageSelect" onchange="displaySelectedImage()">
+            <option value="">Select an image to display</option>
+        </select>
+
+        <img id="imageDisplay" style="display: none;">
+    </div>
+
+    <script>
+        document.getElementById('inputForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitForm();
+        });
+
+        async function submitForm() {
+            const input = document.getElementById('userInput').value;
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `userInput=${encodeURIComponent(input)}`
+                });
+
+                const result = await response.json();  // Expecting a JSON response with filenames
+
+                // Clear and populate the dropdown
+                const select = document.getElementById('imageSelect');
+                select.innerHTML = '<option value="">Select an image to display</option>';
+
+                result.filenames.forEach(filename => {
+                    const option = document.createElement('option');
+                    option.value = "/graphs/BarGraph-"+filename+".png";
+                    option.textContent = filename;
+                    select.appendChild(option);
+                });
+
+                // Show the dropdown if we have images
+                select.style.display = result.filenames.length > 0 ? 'block' : 'none';
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function displaySelectedImage() {
+            const select = document.getElementById('imageSelect');
+            const imageDisplay = document.getElementById('imageDisplay');
+
+            if (select.value) {
+                // Assuming the images are in a static folder served by Flask
+                imageDisplay.src = `${select.value}`;
+                imageDisplay.style.display = 'block';
+            } else {
+                imageDisplay.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
