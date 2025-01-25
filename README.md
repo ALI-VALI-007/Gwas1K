@@ -8,5 +8,5 @@ The FST calculations are in graphs.py
 I believe they are wrong, I am not sure exactly how to correctly use the FST algorithm and what the context is.
 All graphs generated are in the graphs folder as well
 
-Your gonna need to create the database which is databaseCreation
-You need the tsv from 
+Your gonna need to create the database. To do this you can simply do .import and the tsv file
+I will update with the database values later as well
